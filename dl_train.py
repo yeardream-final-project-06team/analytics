@@ -1,6 +1,6 @@
 from time import time
 from scipy.sparse import csc_matrix
-# import tensorflow as tf
+import tensorflow as tf
 import numpy as np
 import h5py
 import pandas as pd
