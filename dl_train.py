@@ -1,10 +1,10 @@
 from time import time
-from scipy.sparse import csc_matrix
 import tensorflow as tf
 import numpy as np
-import h5py
 import pandas as pd
 from collections import defaultdict
+import argparse
+
 
 
 
@@ -42,8 +42,8 @@ def load_train_data(data:pd.DataFrame):
     data['vid'] = data['id'].replace(id_map)
     data['pid'] = data['persona'].replace(persona_map)
 
-    total = data[['vid', 'pid', 'title']]
-    total = total.groupby(['vid','pid']).count()
+    total = data[['pid', 'vid', 'title']]
+    total = total.groupby(['pid','vid']).count()
 
     train = total.sample(frac=0.7, random_state=777)
     test = total.loc[[True if i not in train.index else False for i in total.index ], :]
@@ -302,17 +302,18 @@ def train(R, train_m, train_r, test_m, test_r, optimizer_p, optimizer_f, pred_p,
             print('Time cumulative:', time_cumulative, 'seconds')
             print('.-^-._' * 12)
 
-        saver = tf.train.Saver()
-        saver.save(sess, 'dl_model')
-
-
     # Final result
     print('Epoch:', best_rmse_ep, ' best rmse:', best_rmse)
     print('Epoch:', best_mae_ep, ' best mae:', best_mae)
     print('Epoch:', best_ndcg_ep, ' best ndcg:', best_ndcg)
 
+    return pre
+
+
+
 
 if __name__=='__main__':
+
     data = pd.read_csv('video_detail.csv')
     n_m, n_u, train_r, train_m, test_r, test_m = load_train_data(data)
 
@@ -321,4 +322,5 @@ if __name__=='__main__':
     pred_p, optimizer_p = pretraining(R, train_m, train_r, n_u)
     pred_f, optimizer_f = fine_tuning(R, train_m, train_r, n_u)
 
-    train(R, train_m, train_r, test_m, test_r, optimizer_p, optimizer_f, pred_p, pred_f)
+    pred = train(R, train_m, train_r, test_m, test_r, optimizer_p, optimizer_f, pred_p, pred_f)
+    print(pred)
