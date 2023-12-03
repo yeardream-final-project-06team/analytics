@@ -8,9 +8,6 @@ def recommend_similar_videos(video_id, data, top_n=5):
     if video_id not in data['id'].values:
         return "Video ID not found in the dataset."
 
-    # Extract the target video's data
-    target_video_data = data[data['id'] == video_id]
-
     # Combine title, description, and tags into a single content column
     data['content'] = data['title'] + ' ' + data['description'].fillna('') + ' ' + data['tags'].fillna('')
 
@@ -42,7 +39,7 @@ def recommend_similar_videos(video_id, data, top_n=5):
 if __name__ == '__main__':
     video_data = pd.read_csv('video_detail.csv')
     # Recommending similar videos for the given video ID
-    recommended_videos = recommend_similar_videos("myNjmnvI6x0", video_data)
-    recommended_videos[['id', 'title', 'author', 'url', 'category']] if isinstance(recommended_videos, pd.DataFrame) else recommended_videos
-    print(recommended_videos)
+    recommended_videos = recommend_similar_videos("myNjmnvI6x0", video_data, top_n=50)
+    result = recommended_videos[['id', 'title', 'author', 'url', 'category']] if isinstance(recommended_videos, pd.DataFrame) else recommended_videos
+    print(result)
 
